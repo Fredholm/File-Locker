@@ -14,9 +14,9 @@ public:
     Database();
     ~Database();
 
-    bool Run();
+    int Run();
 
-    void StartMenuPanel();
+    bool StartMenuPanel();
     void StartMenuLogin();
     void StartMenuCreate();
 

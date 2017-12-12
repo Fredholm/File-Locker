@@ -16,6 +16,13 @@ public:
     void Run();
 
 private:
+    void LockerWrite();
+    void SaveFile();
+    void EditFile();
+    void ShowContent();
+    void ChangePassword();
+    void Logout();
+
     User* m_User;
 };
 

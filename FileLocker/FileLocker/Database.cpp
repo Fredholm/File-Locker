@@ -23,13 +23,12 @@ Database::~Database()
         counter--;
         m_Users++;
     }
-    free(original);
 
     if (m_Locker != NULL)
         free(m_Locker);
 }
 
-bool Database::Run()
+int Database::Run()
 {
     printf("\n%d Number of users in the databse.\n", m_NumberOfUsers);
 
@@ -42,27 +41,31 @@ bool Database::Run()
 
         // NOT logged in
         else
-            StartMenuPanel();
+            done = StartMenuPanel();
     }
 
-    return done;
+    printf("\nBye!\n");
+    return 0;
 }
 
-void Database::StartMenuPanel()
+bool Database::StartMenuPanel()
 {
+    bool quit = false;
     int selection = -1;
 
-    printf("\n1. Login\n2. Create User.\n(DEBUG)3. Print all users in database.\n Input: ");
+    printf("\n1. Login\n2. Create User.\n3. Quit\n(DEBUG)4. Print all users in database.\n Input: ");
     scanf("%d", &selection);
-    system("cls");
 
     switch (selection)
     {
-    case 1: StartMenuLogin(); break;
-    case 2: StartMenuCreate(); break;
-    case 3: PrintAllUsers(); break;
+    case 1: StartMenuLogin();   break;
+    case 2: StartMenuCreate();  break;
+    case 3: quit = true;        break;
+    case 4: PrintAllUsers();    break;
     default: break;
     }
+
+    return quit;
 }
 
 void Database::StartMenuCreate()
@@ -70,7 +73,7 @@ void Database::StartMenuCreate()
     char name[24];
     char pass[24];
 
-    printf("Create an account!\n");
+    printf("\n\n\nCreate an account!\n");
     printf("*******\n");
     printf("Username: ");
     scanf("%23s", name);
@@ -86,7 +89,7 @@ void Database::StartMenuLogin()
     char name[24];
     char pass[24];
 
-    printf("Login!\n");
+    printf("\n\n\nLogin!\n");
     printf("*******\n");
     printf("Username: ");
     scanf("%23s", name);
@@ -173,7 +176,7 @@ void Database::DefaultUser(User* user)
 
 void Database::PrintUserInformation(User * user)
 {
-    printf("\nPrinting user information\n");
+    printf("\n\n\nPrinting user information\n");
     printf(" Name: \t\t%s\n", user->s_Username);
     printf(" Password: \t%s\n", user->s_Password);
     printf(" Code: \t\t%s\n", user->s_Code);
