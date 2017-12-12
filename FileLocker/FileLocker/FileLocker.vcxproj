@@ -141,10 +141,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Database.cpp" />
+    <ClCompile Include="Locker.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Database.h" />
+    <ClInclude Include="Locker.h" />
     <ClInclude Include="NonCopyable.h" />
     <ClInclude Include="SaveFile.h" />
     <ClInclude Include="User.h" />
