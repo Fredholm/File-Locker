@@ -15,9 +15,9 @@ Locker::~Locker() { }
 
 void Locker::Setup(User* user)
 {
-    m_User = user;
-    m_Logout = false;
-    m_Quit = false;
+    m_User      = user;
+    m_Logout    = false;
+    m_Quit      = false;
     ResetCurrent();
 }
 
@@ -62,7 +62,7 @@ void Locker::Run()
 
 void Locker::LockerWrite()
 {
-    SaveData* saveData = &m_User->s_SaveData;
+    SaveData* saveData  = &m_User->s_SaveData;
     SaveFile** traveler = saveData->s_Saved;
 
     // Traversing through array

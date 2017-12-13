@@ -33,8 +33,6 @@ private:
     void EditFile(char* filename);
     char* GetFileContent(char* filename);
     void ResetCurrent();
-
-    // Debug 
     void PrintSaveFiles();
     void PrintSaveFile(SaveFile* sf);
 
