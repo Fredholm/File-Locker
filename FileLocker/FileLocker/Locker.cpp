@@ -11,7 +11,10 @@
 
 Locker::Locker() { }
 
-Locker::~Locker() { }
+Locker::~Locker() 
+{
+
+}
 
 void Locker::Setup(User* user)
 {
@@ -113,12 +116,12 @@ void Locker::SaveAFile()
     char buffer[MAX_CHAR_CONTENT];
     
     // Encrypt the content
-    char encrypted[1000];
+    char encrypted[MAX_CHAR_CONTENT];
     memset(encrypted, '\0', MAX_CHAR_CONTENT);
-    for (size_t i = 0, iKey = 0; i < strlen(m_Content); i++)
+    for (size_t i = 0, iKey = 0; i < strlen(m_Content); i++, iKey++)
     {
         if (iKey == strlen(m_User->s_Code)) iKey = 0;
-        encrypted[i] = (m_Content[i] - 32 + m_User->s_Code[iKey] - 32) % 95 + 32;
+        encrypted[i] = ((m_Content[i] - 32 + m_User->s_Code[iKey] - 32) % 95) + 32;
     }
     fwrite(encrypted, 1, MAX_CHAR_CONTENT, ft);
     fclose(ft);
@@ -214,7 +217,6 @@ void Locker::EditFile(char* filename)
     while (!done)
     {
         // Print current editing screen information
-        system("cls");
         printf("Editing %s\n****************\n", filename);
         printf("%s", m_Content);
 
@@ -239,6 +241,7 @@ void Locker::EditFile(char* filename)
             system("cls");
             printf("Saving file and exiting.\n");
         }       
+        system("cls");
     }
 }
 
@@ -259,12 +262,13 @@ char* Locker::GetFileContent(char* filename)
         if (strcmp(buffer, "") == 0) return buffer;
 
         // Decrypt the content
-        char decrypted[1000];
+        char decrypted[MAX_CHAR_CONTENT];
         memset(decrypted, '\0', MAX_CHAR_CONTENT);
-        for (size_t i = 0, iKey = 0; i < strlen(m_Content); i++)
+        for (size_t i = 0, iKey = 0; i < strlen(m_Content); i++, iKey++)
         {
             if (iKey == strlen(m_User->s_Code)) iKey = 0;
-            decrypted[i] = (m_Content[i] + 32 - m_User->s_Code[iKey] + 32) % 95 - 32;
+            printf("Decrypting: %c, with %c, resulting in: %c\n", buffer[i], m_User->s_Code[iKey], (((buffer[i] + 32 - m_User->s_Code[iKey] + 32) + 95) % 95) + 32 + 31);
+            decrypted[i] = (((buffer[i] + 32 - m_User->s_Code[iKey] + 32) + 95) % 95) + 32 + 31;
         }
         memcpy(buffer, decrypted, MAX_CHAR_CONTENT);
     }

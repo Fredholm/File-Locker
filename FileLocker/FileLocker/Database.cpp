@@ -21,7 +21,20 @@ Database::~Database()
     User** original = m_Users;
     while (counter > 0)
     {
-        free(*m_Users);
+        User* user = *m_Users;
+
+        // Remove each user's savefiles
+        int saveFileCounter = user->s_SaveData.s_NumberOfSavedFiles;
+        SaveFile** savefiles = user->s_SaveData.s_Saved;
+        while (saveFileCounter > 0)
+        {
+            free(savefiles);
+            saveFileCounter--;
+            savefiles++;
+        }
+
+        // Remove user
+        free(user);
         counter--;
         m_Users++;
     }
@@ -193,16 +206,17 @@ void Database::DefaultUser(User* user)
 {
     char randomCode[MAX_CHAR_CODE];
     for (size_t i = 0; i < MAX_CHAR_CODE - 1; i++)
-        randomCode[i] = rand() % 90 + 32;
+        randomCode[i] = rand() % 95 + 32;
     randomCode[MAX_CHAR_CODE - 1] = '\0';
+    memcpy(user->s_Code, randomCode, MAX_CHAR_CODE);
 
     printf("Randomized Code: %s\n", randomCode);
 
     // Default char arrays
-    memset(user->s_Code, 'X', MAX_CHAR_CODE);
+//    memset(user->s_Code, 'X', MAX_CHAR_CODE);
     memset(user->s_Password, 'X', MAX_CHAR_PASS);
     memset(user->s_Username, 'X', MAX_CHAR_NAME);
-    user->s_Code[MAX_CHAR_CODE - 1] = '\0';
+  //  user->s_Code[MAX_CHAR_CODE - 1] = '\0';
     user->s_Password[MAX_CHAR_PASS - 1] = '\0';
     user->s_Username[MAX_CHAR_NAME - 1] = '\0';
 
