@@ -32,17 +32,15 @@ Database::~Database()
 
 int Database::Run()
 {
-    printf("\n%d Number of users in the databse.\n", m_NumberOfUsers);
-
     /* JUST SKIPPING THE MAIN MENU */
     if (User* user = CheckCredentials("1", "2"))
     {
         // Setup the locker
         size_t size = sizeof(Locker);
-        printf("Size: %d\n", size);
         m_Locker = (Locker*)malloc(sizeof(Locker));
         m_Locker->Setup(user);
     }
+    /* REMOOOOVE THIS */
 
     bool done = false;
     while (!done)

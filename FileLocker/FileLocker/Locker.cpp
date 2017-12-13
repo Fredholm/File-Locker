@@ -7,6 +7,11 @@
 #include <stdlib.h>
 #include <Windows.h>
 
+#define EMPTY_STRING_SIZE   5
+#define EMPTY_STRING        "Empty"
+
+#define INVALID_STRING      "Invalid"
+
 Locker::Locker() { }
 
 Locker::~Locker() { }
@@ -32,7 +37,8 @@ void Locker::Run()
     while (!m_Logout)
     {
         char selection = '0';
-        printf("\n~Active File.\n Name: %s\n", m_ContentFile);
+        PrintSaveFiles();
+        printf("\n~Active File:\n Name: %s\n", m_ContentFile);
         printf("\n1. Create new file.\n2. Save active file.\n3. Modify old file.\n4. Print content from file.\n5. Change Password.\n6. Logout.\n7. Quit.\n Input: ");
         fseek(stdin, 0, SEEK_END);
         scanf("%c", &selection);
@@ -95,7 +101,34 @@ void Locker::LockerWrite()
 
 void Locker::SaveAFile()
 {
+    // Check if a file is active first
+    if (strcmp(m_Content,       EMPTY_STRING) == 0 ||
+        strcmp(m_ContentFile,   EMPTY_STRING) == 0)
+    {
+        printf("No active file.\n");
+        return;
+    }
 
+    // Write the content down to the file
+    FILE *ft;
+    int ch;
+    ft = fopen(m_ContentFile, "w");
+    char buffer[MAX_CHAR_CONTENT];
+    fwrite(m_Content, 1, MAX_CHAR_CONTENT, ft);
+    fclose(ft);
+
+    // Saving the savefile inside the user's information
+    SaveFile** ptr = m_User->s_SaveData.s_Saved;
+    int counter = m_User->s_SaveData.s_NumberOfSavedFiles;
+    while (counter > 0)
+    {
+        counter--;
+        ptr++;
+    }
+    *ptr = (SaveFile*)malloc(sizeof(SaveFile));
+    memcpy((*ptr)->s_Path, m_ContentFile, MAX_CHAR_FILE);
+
+    printf("Save completed.\n");
 }
 
 void Locker::ModifyFile()
@@ -139,7 +172,7 @@ void Locker::EditFile(char* filename)
     memcpy(m_ContentFile, filename, MAX_CHAR_FILE);
     
     // File not found, reset everything, bad solution, fix this
-    if (strcmp(m_Content, "Invalid") == 0) 
+    if (strcmp(m_Content, INVALID_STRING) == 0)
     {
         system("cls"); 
         printf("\nFile does not exist\n");
@@ -149,6 +182,7 @@ void Locker::EditFile(char* filename)
 
     int pos = strlen(m_Content);
 
+    fseek(stdin, 0, SEEK_END);
     while (!done)
     {
         // Print current editing screen information
@@ -156,7 +190,8 @@ void Locker::EditFile(char* filename)
         printf("Editing %s\n****************\n", filename);
         printf("%s", m_Content);
 
-        // Simple single character read
+        // Simple single character read to get the typewriter effect, 
+        //  it automaticly get's looped because stdin doesn't get flushed
         int nread = -1;
         if (((nread = getc(stdin)) != EOF))
         {
@@ -170,6 +205,8 @@ void Locker::EditFile(char* filename)
         if (m_Content[pos - 2] == '-' &&
             m_Content[pos - 1] == '1')
         {
+            m_Content[pos - 2] = '\0';
+            m_Content[pos - 1] = '\0';
             done = true;
             system("cls");
             printf("Saving file and exiting.\n");
@@ -179,7 +216,7 @@ void Locker::EditFile(char* filename)
 
 char* Locker::GetFileContent(char* filename)
 {
-    char buffer[MAX_CHAR_CONTENT] = "Invalid";
+    char buffer[MAX_CHAR_CONTENT] = INVALID_STRING;
 
     // Creates the actual file
     FILE *ft;
@@ -196,8 +233,27 @@ char* Locker::GetFileContent(char* filename)
 
 void Locker::ResetCurrent()
 {
-    memset(m_Content,       '\0', MAX_CHAR_CONTENT);  
-    memset(m_ContentFile,   '\0', MAX_CHAR_FILE); 
-    memcpy(m_Content,       "Empty", 5);
-    memcpy(m_ContentFile,   "Empty", 5);
+    memset(m_Content,       '\0',           MAX_CHAR_CONTENT);  
+    memset(m_ContentFile,   '\0',           MAX_CHAR_FILE); 
+    memcpy(m_Content,       EMPTY_STRING,   EMPTY_STRING_SIZE);
+    memcpy(m_ContentFile,   EMPTY_STRING,   EMPTY_STRING_SIZE);
+}
+
+void Locker::PrintSaveFiles()
+{
+    printf("~Your Savefiles: \n");
+    SaveFile** ptr = m_User->s_SaveData.s_Saved;
+    int counter = m_User->s_SaveData.s_NumberOfSavedFiles;
+    if (counter == 0) printf(" No saved files.\n");
+    while (counter > 0)
+    {
+        PrintSaveFile(*ptr);
+        counter--;
+        ptr++;
+    }
+}
+
+void Locker::PrintSaveFile(SaveFile* sf)
+{
+    printf(" Path: %s\n", sf->s_Path);
 }

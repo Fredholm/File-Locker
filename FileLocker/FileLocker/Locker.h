@@ -34,6 +34,10 @@ private:
     char* GetFileContent(char* filename);
     void ResetCurrent();
 
+    // Debug 
+    void PrintSaveFiles();
+    void PrintSaveFile(SaveFile* sf);
+
     char    m_ContentFile[MAX_CHAR_FILE];
     char    m_Content[MAX_CHAR_CONTENT];
     bool    m_Quit;
