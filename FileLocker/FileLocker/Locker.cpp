@@ -1,6 +1,4 @@
 #include "Locker.h"
-
-// File Manipulation
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
@@ -9,7 +7,6 @@
 
 #define EMPTY_STRING_SIZE   5
 #define EMPTY_STRING        "Empty"
-
 #define INVALID_STRING      "Invalid"
 
 Locker::Locker() { }
@@ -149,6 +146,28 @@ void Locker::ShowContent()
 
 void Locker::ChangePassword()
 {
+    char pass_1[MAX_CHAR_FILE];
+    char pass_2[MAX_CHAR_FILE];
+
+    // Get password input from user
+    printf("Change password\n Password: ");
+    scanf("%23s", &pass_1);
+    printf("Again please.\n Password: ");
+    scanf("%23s", &pass_2);
+
+    // Check if passwords are correct
+    if (strcmp(pass_1, pass_2) == 0)
+    {
+        // Changes the password
+        memcpy(m_User->s_Password, pass_1, MAX_CHAR_PASS);
+        printf("Your password have been changed.\n\n");
+    }
+    else
+    {
+        // Wrong password
+        printf("The two passwords didn't match.\n");
+        printf("Your password have not been changed.\n\n");
+    }
 }
 
 void Locker::Logout()
