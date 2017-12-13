@@ -150,6 +150,11 @@ User* Database::CheckCredentials(char* name, char* pass)
                 printf("Wrong password.\n");
             }
         }
+        else
+        {
+            printf("No user with that username.\n");
+        }
+
         counter--;
         m_Users++;
     }
@@ -186,6 +191,13 @@ void Database::AddUser(char* name, char* pass)
 
 void Database::DefaultUser(User* user)
 {
+    char randomCode[MAX_CHAR_CODE];
+    for (size_t i = 0; i < MAX_CHAR_CODE - 1; i++)
+        randomCode[i] = rand() % 90 + 32;
+    randomCode[MAX_CHAR_CODE - 1] = '\0';
+
+    printf("Randomized Code: %s\n", randomCode);
+
     // Default char arrays
     memset(user->s_Code, 'X', MAX_CHAR_CODE);
     memset(user->s_Password, 'X', MAX_CHAR_PASS);

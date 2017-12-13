@@ -6,6 +6,7 @@ extern "C" {
 
 int main()
 {
+    srand(time_t(NULL));
     Database DB;
     return DB.Run();
 }

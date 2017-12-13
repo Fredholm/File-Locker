@@ -111,7 +111,16 @@ void Locker::SaveAFile()
     int ch;
     ft = fopen(m_ContentFile, "w");
     char buffer[MAX_CHAR_CONTENT];
-    fwrite(m_Content, 1, MAX_CHAR_CONTENT, ft);
+    
+    // Encrypt the content
+    char encrypted[1000];
+    memset(encrypted, '\0', MAX_CHAR_CONTENT);
+    for (size_t i = 0, iKey = 0; i < strlen(m_Content); i++)
+    {
+        if (iKey == strlen(m_User->s_Code)) iKey = 0;
+        encrypted[i] = (m_Content[i] - 32 + m_User->s_Code[iKey] - 32) % 95 + 32;
+    }
+    fwrite(encrypted, 1, MAX_CHAR_CONTENT, ft);
     fclose(ft);
 
     // Saving the savefile inside the user's information
@@ -245,6 +254,19 @@ char* Locker::GetFileContent(char* filename)
     {
         fread(buffer, 1, MAX_CHAR_CONTENT, ft);
         fclose(ft);
+
+        // Skip this if not filled
+        if (strcmp(buffer, "") == 0) return buffer;
+
+        // Decrypt the content
+        char decrypted[1000];
+        memset(decrypted, '\0', MAX_CHAR_CONTENT);
+        for (size_t i = 0, iKey = 0; i < strlen(m_Content); i++)
+        {
+            if (iKey == strlen(m_User->s_Code)) iKey = 0;
+            decrypted[i] = (m_Content[i] + 32 - m_User->s_Code[iKey] + 32) % 95 - 32;
+        }
+        memcpy(buffer, decrypted, MAX_CHAR_CONTENT);
     }
 
     return buffer;
