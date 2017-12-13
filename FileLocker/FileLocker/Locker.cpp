@@ -118,9 +118,9 @@ void Locker::SaveAFile()
     for (size_t i = 0, iKey = 0; i < strlen(m_Content); i++, iKey++)
     {
         if (iKey == strlen(m_User->s_Code)) iKey = 0;
-        printf("Encrypting: %d, with %d, resulting in: %d\n", m_Content[i], m_User->s_Code[iKey], ((m_Content[i] - 32 + m_User->s_Code[iKey] - 32) % 95) + 32);
-        if (m_Content[i] >= 32 || m_Content[i] < 126) encrypted[i] = m_Content[i];
+        if (m_Content[i] <= 32 || m_Content[i] > 126) encrypted[i] = m_Content[i];
         else encrypted[i] = ((m_Content[i] - 32 + m_User->s_Code[iKey] - 32) % 95) + 32;
+        printf("Encrypting: %d (%c), with %d (%c), resulting in: %d (%c)\n", m_Content[i], m_Content[i], m_User->s_Code[iKey], m_User->s_Code[iKey], encrypted[i], encrypted[i]);
     }
     fwrite(encrypted, 1, MAX_CHAR_CONTENT, ft);
     fclose(ft);
@@ -266,9 +266,9 @@ char* Locker::GetFileContent(char* filename)
         for (size_t i = 0, iKey = 0; i < strlen(m_Content); i++, iKey++)
         {
             if (iKey == strlen(m_User->s_Code)) iKey = 0;          
-            printf("Decrypting: %d, with %d, resulting in: %d (%c)\n", buffer[i], m_User->s_Code[iKey], ((buffer[i] + 32 - m_User->s_Code[iKey] + 32) % 95) + 32 + 31, ((buffer[i] + 32 - m_User->s_Code[iKey] + 32) % 95) + 32 + 31);
-            if (buffer[i] >= 32 || buffer[i] < 126) decrypted[i] = buffer[i];
+            if (buffer[i] <= 32 || buffer[i] > 126) decrypted[i] = buffer[i];
             else decrypted[i] = ((buffer[i] + 32 - m_User->s_Code[iKey] + 32) % 95) + 32 + 31;
+            printf("Decrypting: %d (%c), with %d (%c), resulting in: %d (%c)\n", buffer[i], buffer[i], m_User->s_Code[iKey], m_User->s_Code[iKey], decrypted[i], decrypted[i]);
         }
         memcpy(buffer, decrypted, MAX_CHAR_CONTENT);
     }
