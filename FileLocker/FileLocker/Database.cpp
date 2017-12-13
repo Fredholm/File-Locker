@@ -1,14 +1,16 @@
 #include "Database.h"
 
+#define MAX_USERS 512
+
 Database::Database()
 {
     m_Users         = NULL;
     m_Locker        = NULL;
     m_NumberOfUsers = 0;
 
-    m_Users = (User**)malloc(sizeof(User*));
+    m_Users = (User**)malloc(sizeof(User*) * MAX_USERS);
 
-    AddUser("Name_1", "Pass_1");
+    AddUser("1", "2");
     AddUser("Name_2", "Pass_2");
     AddUser("Name_3", "Pass_3");
 }
@@ -32,12 +34,37 @@ int Database::Run()
 {
     printf("\n%d Number of users in the databse.\n", m_NumberOfUsers);
 
+    /* JUST SKIPPING THE MAIN MENU */
+    if (User* user = CheckCredentials("1", "2"))
+    {
+        // Setup the locker
+        size_t size = sizeof(Locker);
+        printf("Size: %d\n", size);
+        m_Locker = (Locker*)malloc(sizeof(Locker));
+        m_Locker->Setup(user);
+    }
+
     bool done = false;
     while (!done)
     {
         // Logged in
         if (m_Locker != NULL)
+        {
             m_Locker->Run();
+
+            // Quick Exit
+            if (m_Locker->GetQuit())
+            {
+                done = true;
+            }
+
+            // Logout
+            else if (m_Locker->GetLogout())
+            {
+                free(m_Locker);
+                m_Locker = NULL;
+            }
+        }
 
         // NOT logged in
         else
@@ -70,8 +97,8 @@ bool Database::StartMenuPanel()
 
 void Database::StartMenuCreate()
 {
-    char name[24];
-    char pass[24];
+    char name[MAX_CHAR_NAME];
+    char pass[MAX_CHAR_PASS];
 
     printf("\n\n\nCreate an account!\n");
     printf("*******\n");
@@ -86,8 +113,8 @@ void Database::StartMenuCreate()
 
 void Database::StartMenuLogin()
 {
-    char name[24];
-    char pass[24];
+    char name[MAX_CHAR_NAME];
+    char pass[MAX_CHAR_PASS];
 
     printf("\n\n\nLogin!\n");
     printf("*******\n");
@@ -152,8 +179,8 @@ void Database::AddUser(char* name, char* pass)
     m_NumberOfUsers++;
 
     // Setting inserted name and password
-    memcpy((*m_Users)->s_Username, name, 24);
-    memcpy((*m_Users)->s_Password, pass, 24);
+    memcpy((*m_Users)->s_Username, name, MAX_CHAR_NAME);
+    memcpy((*m_Users)->s_Password, pass, MAX_CHAR_PASS);
 
     // Reset the pointer to the user array
     m_Users = original;
@@ -171,7 +198,7 @@ void Database::DefaultUser(User* user)
 
     // Default save data
     user->s_SaveData.s_NumberOfSavedFiles = 0;
-    user->s_SaveData.s_Saved = NULL;
+    user->s_SaveData.s_Saved = (SaveFile**)malloc(sizeof(SaveFile*) * MAX_SAVE_FILES);
 }
 
 void Database::PrintUserInformation(User * user)

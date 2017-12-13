@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define MAX_CHAR_CONTENT 1000
+
 class Locker
 {
 public:
@@ -15,15 +17,28 @@ public:
     void Setup(User* user);
     void Run();
 
+    bool GetQuit()      { return m_Quit;    }
+    bool GetLogout()    { return m_Logout;  }
+
 private:
     void LockerWrite();
-    void SaveFile();
-    void EditFile();
+    void SaveAFile();
+    void ModifyFile();
     void ShowContent();
     void ChangePassword();
     void Logout();
+    void Quit();
 
-    User* m_User;
+    // Internal uses
+    void EditFile(char* filename);
+    char* GetFileContent(char* filename);
+    void ResetCurrent();
+
+    char    m_ContentFile[MAX_CHAR_FILE];
+    char    m_Content[MAX_CHAR_CONTENT];
+    bool    m_Quit;
+    bool    m_Logout;
+    User*   m_User;
 };
 
 #endif // !LOCKER_H
