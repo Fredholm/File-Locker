@@ -204,10 +204,13 @@ void Database::AddUser(char* name, char* pass)
 
 void Database::DefaultUser(User* user)
 {
-    char randomCode[MAX_CHAR_CODE];
-    for (size_t i = 0; i < MAX_CHAR_CODE - 1; i++)
-        randomCode[i] = rand() % 26 + 'A';
-    randomCode[MAX_CHAR_CODE - 1] = '\0';
+    //char randomCode[MAX_CHAR_CODE];
+    //for (size_t i = 0; i < MAX_CHAR_CODE - 1; i++)
+    //    randomCode[i] = rand() % 26 + 'A';
+    //randomCode[MAX_CHAR_CODE - 1] = '\0';
+    //memcpy(user->s_Code, randomCode, MAX_CHAR_CODE);
+    
+    char randomCode[MAX_CHAR_CODE] = "key";
     memcpy(user->s_Code, randomCode, MAX_CHAR_CODE);
 
     printf("Randomized Code: %s\n", randomCode);
