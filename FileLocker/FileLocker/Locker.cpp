@@ -117,12 +117,20 @@ void Locker::SaveAFile()
     memset(encrypted, '\0', MAX_CHAR_CONTENT);
     for (size_t i = 0, iKey = 0; i < strlen(m_Content); i++, iKey++)
     {
-        if (iKey == strlen(m_User->s_Code)) iKey = 0;
+        // Resetting the key position
+        if (iKey == strlen(m_User->s_Code)) iKey = 0;               
+
+        // Exceptions of encryptions, these characters stay the same
         if (m_Content[i] < 32 || m_Content[i] > 126) encrypted[i] = m_Content[i];
+
+        // Encrypt content character with user-code
         else encrypted[i] = ((m_Content[i] - 32 + m_User->s_Code[iKey] - 32) % 95) + 32;
-        printf("Encrypting: %d (%c), with %d (%c), resulting in: %d (%c)\n", m_Content[i], m_Content[i], m_User->s_Code[iKey], m_User->s_Code[iKey], encrypted[i], encrypted[i]);
     }
+
+    // Write the encrypted char array to the file
     fwrite(encrypted, 1, MAX_CHAR_CONTENT, ft);
+
+    // Close the file
     fclose(ft);
 
     // Saving the savefile inside the user's information
@@ -133,9 +141,10 @@ void Locker::SaveAFile()
         counter--;
         ptr++;
     }
+
+    // Creates a new save file in the first available position in the array
     *ptr = (SaveFile*)malloc(sizeof(SaveFile));
     memcpy((*ptr)->s_Path, m_ContentFile, MAX_CHAR_FILE);
-
     printf("Save completed.\n");
 }
 
@@ -152,6 +161,7 @@ void Locker::ModifyFile()
 
 void Locker::ShowContent()
 {
+    // Simple print of the current file's content
     printf("Content in active file:\n %s", m_Content);
 }
 
@@ -183,22 +193,26 @@ void Locker::ChangePassword()
 
 void Locker::Logout()
 {
-    m_User      = NULL;
-    m_Logout    = true;
-    m_Quit      = false;
+    m_User      = NULL;     // User's gets free'd elsewhere
+    m_Logout    = true;     // Toggle
+    m_Quit      = false;    // Toggle
 }
 
 void Locker::Quit()
 {
-    m_User      = NULL;
-    m_Logout    = true;
-    m_Quit      = true;
+    m_User      = NULL;     // User's gets free'd elsewhere
+    m_Logout    = true;     // Toggle
+    m_Quit      = true;     // Toggle
 }
 
 void Locker::EditFile(char* filename)
 {
     bool done = false;
+
+    // Copy content from file into our member
     memcpy(m_Content, GetFileContent(filename), MAX_CHAR_CONTENT);
+
+    // Also save the current content file path
     memcpy(m_ContentFile, filename, MAX_CHAR_FILE);
     
     // File not found, reset everything, bad solution, fix this
@@ -265,16 +279,20 @@ char* Locker::GetFileContent(char* filename)
         memset(decrypted, '\0', MAX_CHAR_CONTENT);
         for (size_t i = 0, iKey = 0; i < strlen(m_Content); i++, iKey++)
         {
+            // Resetting the key position
             if (iKey == strlen(m_User->s_Code)) iKey = 0;    
 
-            printf("Buffer + Code = Answer, %d - %d = %d\n", buffer[i] + 32, m_User->s_Code[iKey] + 32, int(buffer[i] + 32) - int(m_User->s_Code[iKey] + 32));
-            printf("  Answer procent 95 = Answer_2, %d % 95 = %d\n", int(buffer[i] + 32) - int(m_User->s_Code[iKey] + 32), int(int(buffer[i] + 32) - int(m_User->s_Code[iKey] + 32) % 95));
-
+            // Exceptions, characters that have not been encrypted
             if (buffer[i] < 32 || buffer[i] > 126) decrypted[i] = buffer[i];
+
+            // Special case, modulus can't handle correcly
             else if (int(buffer[i] + 32) - int(m_User->s_Code[iKey] + 32) >= 0) decrypted[i] = int(buffer[i] + 32) - int(m_User->s_Code[iKey] + 32) + 32;
+
+            // Normal decryption
             else decrypted[i] = int(int(buffer[i] + 32) - int(m_User->s_Code[iKey] + 32) % 95) + 32;
-            printf("   Decrypting: %d (%c), with %d (%c), resulting in: %d (%c)\n", buffer[i], buffer[i], m_User->s_Code[iKey], m_User->s_Code[iKey], decrypted[i], decrypted[i]);
         }
+
+        // Copy the decrypted data to the buffer to use as return ptr 
         memcpy(buffer, decrypted, MAX_CHAR_CONTENT);
     }
 
