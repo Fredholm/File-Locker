@@ -1,6 +1,9 @@
 #include "Database.h"
 
+#define _PRINT_INFO false   // Prints extra information for debugging uses
+
 #define MAX_USERS 512
+
 
 Database::Database()
 {
@@ -204,22 +207,21 @@ void Database::AddUser(char* name, char* pass)
 
 void Database::DefaultUser(User* user)
 {
-    //char randomCode[MAX_CHAR_CODE];
-    //for (size_t i = 0; i < MAX_CHAR_CODE - 1; i++)
-    //    randomCode[i] = rand() % 26 + 'A';
-    //randomCode[MAX_CHAR_CODE - 1] = '\0';
-    //memcpy(user->s_Code, randomCode, MAX_CHAR_CODE);
-    
-    char randomCode[MAX_CHAR_CODE] = "key";
+    char randomCode[MAX_CHAR_CODE];
+    for (size_t i = 0; i < MAX_CHAR_CODE - 1; i++)
+        randomCode[i] = rand() % 26 + 'A';
+    randomCode[MAX_CHAR_CODE - 1] = '\0';
     memcpy(user->s_Code, randomCode, MAX_CHAR_CODE);
 
-    printf("Randomized Code: %s\n", randomCode);
+#if _DEBUG
+#if _PRINT_INFO
+    printf(" ~Randomized Code: %s\n", randomCode);
+#endif
+#endif
 
     // Default char arrays
-//    memset(user->s_Code, 'X', MAX_CHAR_CODE);
     memset(user->s_Password, 'X', MAX_CHAR_PASS);
     memset(user->s_Username, 'X', MAX_CHAR_NAME);
-  //  user->s_Code[MAX_CHAR_CODE - 1] = '\0';
     user->s_Password[MAX_CHAR_PASS - 1] = '\0';
     user->s_Username[MAX_CHAR_NAME - 1] = '\0';
 
