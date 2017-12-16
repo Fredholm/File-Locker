@@ -124,26 +124,17 @@ struct User* CheckCredentials(struct User** users, int* count, char* name, char*
     int counter = *count;
     while (counter > 0 && !success)
     {
-        if (strcmp(name, (*users)->s_Username) == 0)
-        {
-            if (strcmp(pass, (*users)->s_Password) == 0)
-            {
+        if (strcmp(name, (*users)->s_Username) == 0 && 
+            strcmp(pass, (*users)->s_Password) == 0)
                 success = *users;
-            }
-            else
-            {
-                printf("Wrong password.\n");
-            }
-        }
-        else
-        {
-            printf("No user with that username.\n");
-        }
 
         counter--;
         users++;
     }
     users = original;
+
+    if (!success)
+        printf("\nWrong password/username.\n Good luck next time.\n");
 
     return success;
 }
