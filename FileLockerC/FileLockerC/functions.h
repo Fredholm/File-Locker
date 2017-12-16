@@ -74,15 +74,15 @@ void PrintSaveFile(struct SaveFile* sf);
 *******************/
 int RunDB();
 
-int StartMenuPanel();
-void StartMenuLogin();
-void StartMenuCreate();
+int StartMenuPanel(struct User** users, int* count);
+void StartMenuLogin(struct User** users, int* count);
+void StartMenuCreate(struct User** users, int* count);
 
 // Internal Database functions
-struct User* CheckCredentials(char* name, char* pass);
-void AddUser(char* name, char* pass);
+struct User* CheckCredentials(struct User** users, int* count, char* name, char* pass);
+void AddUser(struct User** users, int* count, char* name, char* pass);
 void DefaultUser(struct User* user);
 void PrintUserInformation(struct User* user);
-void PrintAllUsers();
+void PrintAllUsers(struct User** users, int* count);
 
 #endif // !FUNCTIONS_H
