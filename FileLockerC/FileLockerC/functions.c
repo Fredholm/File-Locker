@@ -82,22 +82,6 @@ int StartMenuPanel(struct User** userActive, struct User** users, int* count)
     return quit;
 }
 
-void StartMenuCreate(struct User** users, int* count)
-{
-    char name[MAX_CHAR_NAME];
-    char pass[MAX_CHAR_PASS];
-
-    printf("\n\n\nCreate an account!\n");
-    printf("*******\n");
-    printf("Username: ");
-    scanf("%23s", name);
-    printf("*******\n");
-    printf("Password: ");
-    scanf("%23s", pass);
-
-    AddUser(users, count, name, pass);
-}
-
 void StartMenuLogin(struct User** m_UserActive, struct User** users, int* count)
 {
     char name[MAX_CHAR_NAME];
@@ -117,6 +101,22 @@ void StartMenuLogin(struct User** m_UserActive, struct User** users, int* count)
         printf("Sucess!");
         *m_UserActive = user;
     }
+}
+
+void StartMenuCreate(struct User** users, int* count)
+{
+    char name[MAX_CHAR_NAME];
+    char pass[MAX_CHAR_PASS];
+
+    printf("\n\n\nCreate an account!\n");
+    printf("*******\n");
+    printf("Username: ");
+    scanf("%23s", name);
+    printf("*******\n");
+    printf("Password: ");
+    scanf("%23s", pass);
+
+    AddUser(users, count, name, pass);
 }
 
 struct User* CheckCredentials(struct User** users, int* count, char* name, char* pass)
