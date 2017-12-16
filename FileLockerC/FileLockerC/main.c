@@ -2,5 +2,6 @@
 
 int main()
 {
+//  srand((unsigned int)time(NULL));
     return RunDB();
 }

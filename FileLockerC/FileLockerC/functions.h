@@ -33,10 +33,9 @@
 /*  STRUCTS
 *******************/
 
-// Forward Deceleration
 struct SaveFile
 {
-    char                s_Path[MAX_CHAR_FILE];                 // The Path to the saved file
+    char                s_Path[MAX_CHAR_FILE];          // The Path to the saved file
 };
 
 struct SaveData
@@ -57,9 +56,8 @@ struct User
 /*  DATABASE
 *******************/
 int RunDB();
-
-int StartMenuPanel(struct User* userActive, struct User** users, int* count);
-void StartMenuLogin(struct User* userActive, struct User** users, int* count);
+int StartMenuPanel(struct User** userActive, struct User** users, int* count);
+void StartMenuLogin(struct User** userActive, struct User** users, int* count);
 void StartMenuCreate(struct User** users, int* count);
 
 // Internal Database functions
@@ -72,18 +70,17 @@ void PrintAllUsers(struct User** users, int* count);
 /*******************
 /*  LOCKER
 *******************/
-void iRunLocker(struct User* user, int* done);
-     
-void iLockerWrite(struct User* user, char* content, char contentFile);
-void iSaveAFile(struct User* user, char* content, char contentFile);
-void iModifyFile(struct User* user, char* content, char contentFile);
-void iShowContent(struct User* user, char* content, char contentFile);
+void iRunLocker(struct User** user, int* done);
+void iLockerWrite(struct User* user, char* content, char* contentFile);
+void iSaveAFile(struct User* user, char* content, char* contentFile);
+void iModifyFile(struct User* user, char* content, char* contentFile);
+void iShowContent(struct User* user, char* content, char* contentFile);
 void iChangePassword(struct User* user);
 
 // Internal Locker Functions
 void iEditFile(struct User* user, char* filename, char* content, char* contentFile);
-char* iGetFileContent(struct User* user, char* filename, char* content, char* contentFile);
-void iResetCurrent(char* content, char contentFile);
+void iGetFileContent(struct User* user, char* filename, char* content, char* contentFile);
+void iResetCurrent(char* content, char* contentFile);
 void iPrintSaveFiles(struct User* user);
 void iPrintSaveFile(struct SaveFile* sf);
 

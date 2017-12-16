@@ -14,12 +14,15 @@ int RunDB()
     AddUser(m_Users, m_NumberOfUsers, "Name_2", "Pass_2");
     AddUser(m_Users, m_NumberOfUsers, "Name_3", "Pass_3");
 
-    struct User* m_UserActive = NULL;
+    // Active user 
+    struct User** m_UserActive = (struct User**)malloc(sizeof(struct User*));
+    *m_UserActive = NULL;
+
     int done = 1;
     while (done == 1)
     {
         // Logged in
-        if (m_UserActive != NULL)
+        if (*m_UserActive != NULL)
             iRunLocker(m_UserActive, &done);
 
         // NOT logged in
@@ -27,7 +30,7 @@ int RunDB()
             done = StartMenuPanel(m_UserActive, m_Users, m_NumberOfUsers);
     }
 
-    int* counter = m_NumberOfUsers;
+    int counter = *m_NumberOfUsers;
     struct User** original = m_Users;
     while (counter > 0)
     {
@@ -49,9 +52,7 @@ int RunDB()
         m_Users++;
     }
 
-    //if (m_Locker != NULL)
-    //    free(m_Locker);
-
+    free(m_UserActive);
     free(m_NumberOfUsers);
 
     printf("\nBye!\n");
@@ -59,7 +60,7 @@ int RunDB()
     return 0;
 }
 
-int StartMenuPanel(struct User* userActive, struct User** users, int* count)
+int StartMenuPanel(struct User** userActive, struct User** users, int* count)
 {
     int quit = 1;
     int selection = -1;
@@ -95,7 +96,7 @@ void StartMenuCreate(struct User** users, int* count)
     AddUser(users, count, name, pass);
 }
 
-void StartMenuLogin(struct User* m_UserActive, struct User** users, int* count)
+void StartMenuLogin(struct User** m_UserActive, struct User** users, int* count)
 {
     char name[MAX_CHAR_NAME];
     char pass[MAX_CHAR_PASS];
@@ -112,7 +113,7 @@ void StartMenuLogin(struct User* m_UserActive, struct User** users, int* count)
     if (user != NULL)
     {
         printf("Sucess!");
-        m_UserActive = user;
+        *m_UserActive = user;
     }
 }
 
@@ -226,22 +227,23 @@ void PrintAllUsers(struct User** users, int* count)
 /*  LOCKER
 *******************/
 
-void iRunLocker(struct User* user, int* done)
+void iRunLocker(struct User** user, int* done)
 {
+    int*            doneKeeper = done;
     char            m_ContentFile[MAX_CHAR_FILE];
     char            m_Content[MAX_CHAR_CONTENT];
-    struct User*    m_User = user;
+    struct User*    m_User = *user;
 
     // Initialize char arrays
-    iResetCurrent(m_Content, m_ContentFile);
+    iResetCurrent(&m_Content, &m_ContentFile);
 
     // Main loop for the locker
     int logout = 1;
-    while (logout == 1)
+    while (logout == 1 && *doneKeeper == 1)
     {
         char selection = '0';
         iPrintSaveFiles(m_User);
-        printf("\n~Active File:\n Name: %s\n", m_ContentFile);
+        printf("\n~Active File:\n Name: %s\n", &m_ContentFile);
         printf("\n1. Create new file.\n2. Save active file.\n3. Modify old file.\n4. Print content from file.\n5. Change Password.\n6. Logout.\n7. Quit.\n Input: ");
         fseek(stdin, 0, SEEK_END);
         scanf("%c", &selection);
@@ -250,24 +252,24 @@ void iRunLocker(struct User* user, int* done)
         {
             switch (selection - '0')
             {
-            case 1: iLockerWrite(user, m_Content, m_ContentFile);   break;
-            case 2: iSaveAFile(user, m_Content, m_ContentFile);     break;
-            case 3: iModifyFile(user, m_Content, m_ContentFile);    break;
-            case 4: iShowContent(user, m_Content, m_ContentFile);   break;
-            case 5: iChangePassword(user);                          break;
-            case 6: logout = 0;                                     break;
-            case 7: *done = 0;                                      break;
-            default:                                                break;
+            case 1: iLockerWrite(m_User, &m_Content, &m_ContentFile);       break;
+            case 2: iSaveAFile(m_User, &m_Content, &m_ContentFile);         break;
+            case 3: iModifyFile(m_User, &m_Content, &m_ContentFile);        break;
+            case 4: iShowContent(m_User, &m_Content, &m_ContentFile);       break;
+            case 5: iChangePassword(m_User);                                break;
+            case 6: logout = 0;                                             break;
+            case 7: *doneKeeper = 0;                                        break;
+            default:                                                        break;
             }
         }
         else printf("Please insert a number, not a letter.\n");
     }
 
-    user = NULL;
+    *user = NULL;
     return;
 }
 
-void iLockerWrite(struct User* user, char* content, char contentFile)
+void iLockerWrite(struct User* user, char* content, char* contentFile)
 {
     struct SaveData* saveData = &user->s_SaveData;
     struct SaveFile** traveler = saveData->s_Saved;
@@ -303,7 +305,7 @@ void iLockerWrite(struct User* user, char* content, char contentFile)
     iEditFile(user, name, content, contentFile);
 }
 
-void iSaveAFile(struct User* user, char* content, char contentFile)
+void iSaveAFile(struct User* user, char* content, char* contentFile)
 {
     // Check if a file is active first
     if (strcmp(content,     EMPTY_STRING) == 0 ||
@@ -355,7 +357,7 @@ void iSaveAFile(struct User* user, char* content, char contentFile)
     printf("Save completed.\n");
 }
 
-void iModifyFile(struct User* user, char* content, char contentFile)
+void iModifyFile(struct User* user, char* content, char* contentFile)
 {
     // Get filename from user
     char name[MAX_CHAR_FILE];
@@ -366,7 +368,7 @@ void iModifyFile(struct User* user, char* content, char contentFile)
     iEditFile(user, name, content, contentFile);
 }
 
-void iShowContent(struct User* user, char* content, char contentFile)
+void iShowContent(struct User* user, char* content, char* contentFile)
 {
     // Get filename from user
     char name[MAX_CHAR_FILE];
@@ -374,7 +376,13 @@ void iShowContent(struct User* user, char* content, char contentFile)
     scanf("%23s", &name);
 
     // Simple print of the current file's content
-    printf("Content in %s:\n %s", name, iGetFileContent(user, name, content, contentFile));
+    char tempContent[MAX_CHAR_CONTENT];
+    char tempPath[MAX_CHAR_FILE];
+    iGetFileContent(user, name, tempContent, tempPath);
+
+    // Print results
+    system("cls");
+    printf("Content in %s:\n %s\n\n", tempPath, tempContent);
 }
 
 void iChangePassword(struct User* user)
@@ -405,13 +413,10 @@ void iChangePassword(struct User* user)
 
 void iEditFile(struct User* user, char* filename, char* content, char* contentFile)
 {
-    int done = 1;
+    int editDone = 1;
 
-    // Copy content from file into our member
-    memcpy(content, iGetFileContent(user, filename, content, contentFile), MAX_CHAR_CONTENT);
-
-    // Also save the current content file path
-    memcpy(contentFile, filename, MAX_CHAR_FILE);
+    // Get file content
+    iGetFileContent(user, filename, content, contentFile);
 
     // File not found, reset everything, bad solution, fix this
     if (strcmp(content, INVALID_STRING) == 0)
@@ -425,7 +430,7 @@ void iEditFile(struct User* user, char* filename, char* content, char* contentFi
     int pos = strlen(content);
 
     fseek(stdin, 0, SEEK_END);
-    while (done == 1)
+    while (editDone == 1)
     {
         // Print current editing screen information
         printf("Editing %s\n****************\n", filename);
@@ -448,7 +453,7 @@ void iEditFile(struct User* user, char* filename, char* content, char* contentFi
         {
             content[pos - 2] = '\0';
             content[pos - 1] = '\0';
-            done = 0;
+            editDone = 0;
             system("cls");
             printf("Saving file and exiting.\n");
         }
@@ -456,9 +461,9 @@ void iEditFile(struct User* user, char* filename, char* content, char* contentFi
     }
 }
 
-char* iGetFileContent(struct User* user, char* filename, char* content, char* contentFile)
+void iGetFileContent(struct User* user, char* filename, char* content, char* contentFile)
 {
-    char buffer[MAX_CHAR_CONTENT] = INVALID_STRING;
+    char buffer[MAX_CHAR_CONTENT] = EMPTY_STRING;
 
     // Creates the actual file
     FILE *ft;
@@ -470,12 +475,18 @@ char* iGetFileContent(struct User* user, char* filename, char* content, char* co
         fclose(ft);
 
         // Skip this if not filled
-        if (strcmp(buffer, "") == 0) return buffer;
+        if (strcmp(buffer, "") == 0)
+        {
+            // Nothing in file, fill variables
+            memcpy(content, buffer, MAX_CHAR_CONTENT);
+            memcpy(contentFile, filename, MAX_CHAR_FILE);
+            return buffer;
+        }
 
         // Decrypt the content
         char decrypted[MAX_CHAR_CONTENT];
         memset(decrypted, '\0', MAX_CHAR_CONTENT);
-        for (size_t i = 0, iKey = 0; i < strlen(content); i++, iKey++)
+        for (size_t i = 0, iKey = 0; i < strlen(buffer); i++, iKey++)
         {
             // Resetting the key position
             if (iKey == strlen(user->s_Code)) iKey = 0;
@@ -484,20 +495,28 @@ char* iGetFileContent(struct User* user, char* filename, char* content, char* co
             if (buffer[i] < 32 || buffer[i] > 126) decrypted[i] = buffer[i];
 
             // Special case, modulus can't handle correcly
-            else if ((buffer[i] + 32) - (user->s_Code[iKey] + 32) >= 0) decrypted[i] = (buffer[i] + 32) - (user->s_Code[iKey] + 32) + 32;
+            else if (((int)(buffer[i] + 32)) - ((int)(user->s_Code[iKey] + 32)) >= 0) decrypted[i] = ((int)(buffer[i] + 32)) - ((int)(user->s_Code[iKey] + 32)) + 32;
 
             // Normal decryption
-            else decrypted[i] = ((buffer[i] + 32) - (user->s_Code[iKey] + 32) % 95) + 32;
+            else decrypted[i] = ((int)(((int)(buffer[i] + 32))) - ((int)(user->s_Code[iKey] + 32)) % 95) + 32;
         }
 
         // Copy the decrypted data to the buffer to use as return ptr 
         memcpy(buffer, decrypted, MAX_CHAR_CONTENT);
-    }
 
-    return buffer;
+        // Replace the currently active content with the new loaded
+        memcpy(content, buffer, MAX_CHAR_CONTENT);
+        memcpy(contentFile, filename, MAX_CHAR_FILE);
+    }
+    else
+    {
+        // No file was found, put error string
+        memcpy(content, INVALID_STRING, MAX_CHAR_CONTENT);
+        memcpy(contentFile, INVALID_STRING, MAX_CHAR_FILE);
+    }
 }
 
-void iResetCurrent(char* content, char contentFile)
+void iResetCurrent(char* content, char* contentFile)
 {
     memset(content,     '\0', MAX_CHAR_CONTENT);
     memset(contentFile, '\0', MAX_CHAR_FILE);
