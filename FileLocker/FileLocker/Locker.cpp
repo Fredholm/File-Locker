@@ -161,8 +161,13 @@ void Locker::ModifyFile()
 
 void Locker::ShowContent()
 {
+    // Get filename from user
+    char name[MAX_CHAR_FILE];
+    printf("Edit File\n File Name: ");
+    scanf("%23s", &name);
+
     // Simple print of the current file's content
-    printf("Content in active file:\n %s", m_Content);
+    printf("Content in %s:\n %s", name, GetFileContent(name));
 }
 
 void Locker::ChangePassword()
