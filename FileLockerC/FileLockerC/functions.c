@@ -41,10 +41,11 @@ int RunDB()
         struct SaveFile** savefiles = user->s_SaveData.s_Saved;
         while (saveFileCounter > 0)
         {
-            free(savefiles);
+            free(*savefiles);
             saveFileCounter--;
             savefiles++;
         }
+        free(user->s_SaveData.s_Saved);
 
         // Remove user
         free(user);
@@ -52,6 +53,7 @@ int RunDB()
         m_Users++;
     }
 
+    free(original);
     free(m_UserActive);
     free(m_NumberOfUsers);
 
