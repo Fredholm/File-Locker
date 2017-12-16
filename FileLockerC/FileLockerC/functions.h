@@ -24,6 +24,11 @@
 #define _PRINT_INFO         false   // Prints extra information for debugging uses
 #define MAX_USERS           512
 
+// Locker Defines
+#define EMPTY_STRING_SIZE   5
+#define EMPTY_STRING        "Empty"
+#define INVALID_STRING      "Invalid"
+
 /*******************
 /*  STRUCTS
 *******************/
@@ -49,33 +54,12 @@ struct User
 };
 
 /*******************
-/*  LOCKER
-*******************/
-void Setup(struct User* user);
-void RunLocker();
-
-void LockerWrite();
-void SaveAFile();
-void ModifyFile();
-void ShowContent();
-void ChangePassword();
-void Logout();
-void Quit();
-
-// Internal Locker Functions
-void EditFile(char* filename);
-char* GetFileContent(char* filename);
-void ResetCurrent();
-void PrintSaveFiles();
-void PrintSaveFile(struct SaveFile* sf);
-
-/*******************
 /*  DATABASE
 *******************/
 int RunDB();
 
-int StartMenuPanel(struct User** users, int* count);
-void StartMenuLogin(struct User** users, int* count);
+int StartMenuPanel(struct User* userActive, struct User** users, int* count);
+void StartMenuLogin(struct User* userActive, struct User** users, int* count);
 void StartMenuCreate(struct User** users, int* count);
 
 // Internal Database functions
@@ -84,5 +68,23 @@ void AddUser(struct User** users, int* count, char* name, char* pass);
 void DefaultUser(struct User* user);
 void PrintUserInformation(struct User* user);
 void PrintAllUsers(struct User** users, int* count);
+
+/*******************
+/*  LOCKER
+*******************/
+void iRunLocker(struct User* user, int* done);
+     
+void iLockerWrite(struct User* user, char* content, char contentFile);
+void iSaveAFile(struct User* user, char* content, char contentFile);
+void iModifyFile(struct User* user, char* content, char contentFile);
+void iShowContent(struct User* user, char* content, char contentFile);
+void iChangePassword(struct User* user);
+
+// Internal Locker Functions
+void iEditFile(struct User* user, char* filename, char* content, char* contentFile);
+char* iGetFileContent(struct User* user, char* filename, char* content, char* contentFile);
+void iResetCurrent(char* content, char contentFile);
+void iPrintSaveFiles(struct User* user);
+void iPrintSaveFile(struct SaveFile* sf);
 
 #endif // !FUNCTIONS_H
