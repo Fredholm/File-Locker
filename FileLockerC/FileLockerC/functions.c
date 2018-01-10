@@ -1,16 +1,15 @@
 #include "functions.h"
 
-int inc = 0;
+int inc = 1;
 
 /*******************
 /*  DATABASE
 *******************/
 int RunDB()
 {
-    struct User**   m_Users = (struct User**)malloc(sizeof(struct User*) * MAX_USERS);
+    struct User**   m_Users = (struct User**)malloc(sizeof(struct User*) * MAX_USERS * inc);
     int*            m_NumberOfUsers = (int*)malloc(sizeof(int));
     *m_NumberOfUsers = 0;
-    inc = 1;
 
     AddUser(m_Users, m_NumberOfUsers, "1", "2");
     AddUser(m_Users, m_NumberOfUsers, "Name_2", "Pass_2");
