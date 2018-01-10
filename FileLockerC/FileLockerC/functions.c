@@ -1,14 +1,16 @@
 #include "functions.h"
 
+int inc = 0;
+
 /*******************
 /*  DATABASE
 *******************/
-
 int RunDB()
 {
     struct User**   m_Users = (struct User**)malloc(sizeof(struct User*) * MAX_USERS);
     int*            m_NumberOfUsers = (int*)malloc(sizeof(int));
     *m_NumberOfUsers = 0;
+    inc = 1;
 
     AddUser(m_Users, m_NumberOfUsers, "1", "2");
     AddUser(m_Users, m_NumberOfUsers, "Name_2", "Pass_2");
@@ -143,6 +145,57 @@ struct User* CheckCredentials(struct User** users, int* count, char* name, char*
 
 void AddUser(struct User** users, int* count, char* name, char* pass)
 {
+    if (inc * MAX_USERS <= count)
+    {
+        inc++;
+        
+        // Allocates the new size of a array with an increased size of MAX_USERS
+        struct User** temp = (struct User**)malloc(sizeof(struct User*) * MAX_USERS * inc);
+        
+        // Removes the previous user array and at the same time copies over the data to the new array
+        int counter = *count;
+        struct User** old = users;
+        struct User** new = temp;
+        while (counter > 0)
+        {
+            struct User* user = *old;
+
+            // Copies the content from the old array spot to the new array
+            *new = (struct User*)malloc(sizeof(struct User));    
+            DefaultUser(new);
+            
+            // Setting inserted name and password to the fresh array
+            memcpy((*new)->s_Username, user->s_Name, MAX_CHAR_NAME);
+            memcpy((*new)->s_Password, user->s_PAss, MAX_CHAR_PASS);
+            new->s_SaveData.s_NumberOfSavedFiles = user->s_SaveData.s_NumberOfSavedFiles;
+            
+            // Remove each user's savefiles
+            int saveFileCounter = user->s_SaveData.s_NumberOfSavedFiles;
+            struct SaveFile** savefiles = user->s_SaveData.s_Saved;
+            struct SaveFile** newSaves = new->s_SaveData.s_Saved;
+            while (saveFileCounter > 0)
+            {
+                *newSaves = *savefiles;
+                free(*savefiles);
+                saveFileCounter--;
+                savefiles++;
+                newSaves++;
+            }
+            free(user->s_SaveData.s_Saved);
+
+            // Remove user
+            free(user);
+            counter--;
+            old++;
+            new++;
+        }
+        
+        free(old);
+      
+        // Point to the new array instead of the old one
+        users = temp;   
+    }
+    
     // Saving the original pointer to the user array
     struct User** original = users;
 
